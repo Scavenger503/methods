@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hacking Methods Simulation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      background: #02010a;
+      color: #00ffcc;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ffaa;
+      text-shadow: 0 0 10px #00ffaa88;
+      margin-bottom: 20px;
+    }
+    .container {
+      display: flex;
+      gap: 40px;
+    }
+    .panel {
+      background: #0f0f1f;
+      border: 1px solid #00ffaa44;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00ffaa44;
+      padding: 20px;
+      width: 500px;
+      height: 500px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 14px;
+    }
+    .title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #00ffee;
+    }
+    .log-line {
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    .done {
+      text-align: center;
+      color: #99ff99;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hacking Methods Simulation</h1>
+  <div class="container">
+    <div class="panel" id="hackerPanel">
+      <div class="title">🧑‍💻 Hacker Terminal</div>
+    </div>
+    <div class="panel" id="targetPanel">
+      <div class="title">🎯 Target System</div>
+    </div>
+  </div>
+  <div class="done" id="doneNotice" style="display: none;">
+    ✅ Simulation complete. Multiple attack vectors demonstrated.
+  </div>
+
+  <script>
+    const hackerSteps = [
+      "Crafting phishing email...",
+      "Sent: subject='Your account is locked' -> victim@email.com",
+      "Waiting for click...",
+      "[✓] User clicked link. Harvesting credentials...",
+      "",
+      "Launching brute-force attack on login portal...",
+      "Trying passwords: admin123, password1, welcome...",
+      "[✓] Login success: user=admin",
+      "",
+      "Injecting SQL payload: ' OR '1'='1",
+      "Extracting user_table: admin, guest, root...",
+      "",
+      "ARP spoofing initiated...",
+      "[~] Intercepting traffic on network 192.168.1.0/24",
+      "[✓] Captured credentials over HTTP",
+      "",
+      "Deploying reverse shell payload...",
+      "[>] Uploading script to target via port 445...",
+      "[✓] Session opened with target system."
+    ];
+
+    const targetSteps = [
+      "📧 New email: 'Your account is locked' - Click to verify",
+      "[!] Suspicious link clicked by user",
+      "🔓 Credentials leaked: admin / ********",
+      "",
+      "🔐 Unusual login from foreign IP detected",
+      "[!] System accessed with weak password",
+      "",
+      "🧮 Database anomaly detected",
+      "[!] Unauthorized query: SELECT * FROM users;",
+      "",
+      "🌐 Network lag detected - traffic rerouted",
+      "[!] Potential MitM: SSL mismatch",
+      "",
+      "💾 New file detected in system32\payload.exe",
+      "[!] Outbound connection initiated",
+      "⚠️ Reverse shell active — system compromised"
+    ];
+
+    function appendLogs(panelId, steps, baseDelay = 1500) {
+      const panel = document.getElementById(panelId);
+      steps.forEach((text, i) => {
+        setTimeout(() => {
+          const line = document.createElement('div');
+          line.className = 'log-line';
+          line.style.animationDelay = `${i * 0.3}s`;
+          line.textContent = text;
+          panel.appendChild(line);
+          panel.scrollTop = panel.scrollHeight;
+        }, i * baseDelay);
+      });
+    }
+
+    function runSimulation() {
+      document.getElementById('hackerPanel').innerHTML = '<div class="title">🧑‍💻 Hacker Terminal</div>';
+      document.getElementById('targetPanel').innerHTML = '<div class="title">🎯 Target System</div>';
+      document.getElementById('doneNotice').style.display = 'none';
+      appendLogs('hackerPanel', hackerSteps, 1400);
+      appendLogs('targetPanel', targetSteps, 1600);
+
+      setTimeout(() => {
+        document.getElementById('doneNotice').style.display = 'block';
+      }, (hackerSteps.length + 2) * 1400);
+    }
+
+    runSimulation();
+    setInterval(runSimulation, (hackerSteps.length + 2) * 1400 + 8000);
+  </script>
+</body>
+</html>
