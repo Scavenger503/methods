@@ -1,145 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Hacking Methods Simulation</title>
+  <meta charset="UTF-8" />
+  <title>Hacking Simulation Terminal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      margin: 0;
-      background: #02010a;
-      color: #00ffcc;
+      background-color: #000;
+      color: #00ffe7;
       font-family: 'Courier New', Courier, monospace;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 20px;
+      min-height: 100vh;
+      margin: 0;
     }
-    h1 {
-      color: #00ffaa;
-      text-shadow: 0 0 10px #00ffaa88;
-      margin-bottom: 20px;
-    }
-    .container {
-      display: flex;
-      gap: 40px;
-    }
-    .panel {
-      background: #0f0f1f;
-      border: 1px solid #00ffaa44;
+    .terminal {
+      background-color: #0a0a0a;
+      border: 2px solid #00ffe7;
+      box-shadow: 0 0 20px #00ffe7aa;
       border-radius: 12px;
-      box-shadow: 0 0 20px #00ffaa44;
+      width: 90%;
+      max-width: 900px;
       padding: 20px;
-      width: 500px;
-      height: 500px;
       overflow-y: auto;
-      white-space: pre-wrap;
-      font-size: 14px;
+      height: 540px;
     }
-    .title {
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #00ffee;
-    }
-    .log-line {
+    .line {
       opacity: 0;
-      animation: fadeIn 1s forwards;
+      animation: fadeIn 0.5s ease forwards;
     }
     @keyframes fadeIn {
       to { opacity: 1; }
     }
-    .done {
-      text-align: center;
-      color: #99ff99;
-      font-weight: bold;
-      margin-top: 20px;
-    }
   </style>
 </head>
 <body>
-  <h1>Hacking Methods Simulation</h1>
-  <div class="container">
-    <div class="panel" id="hackerPanel">
-      <div class="title">🧑‍💻 Hacker Terminal</div>
-    </div>
-    <div class="panel" id="targetPanel">
-      <div class="title">🎯 Target System</div>
-    </div>
-  </div>
-  <div class="done" id="doneNotice" style="display: none;">
-    ✅ Simulation complete. Multiple attack vectors demonstrated.
-  </div>
+  <div class="terminal" id="terminalOutput"></div>
 
   <script>
-    const hackerSteps = [
-      "Crafting phishing email...",
-      "Sent: subject='Your account is locked' -> victim@email.com",
-      "Waiting for click...",
-      "[✓] User clicked link. Harvesting credentials...",
-      "",
-      "Launching brute-force attack on login portal...",
-      "Trying passwords: admin123, password1, welcome...",
-      "[✓] Login success: user=admin",
-      "",
-      "Injecting SQL payload: ' OR '1'='1",
-      "Extracting user_table: admin, guest, root...",
-      "",
-      "ARP spoofing initiated...",
-      "[~] Intercepting traffic on network 192.168.1.0/24",
-      "[✓] Captured credentials over HTTP",
-      "",
-      "Deploying reverse shell payload...",
-      "[>] Uploading script to target via port 445...",
-      "[✓] Session opened with target system."
+    const lines = [
+      "user@cyberdeck:~$ nmap -sS -Pn 192.168.1.104",
+      "[+] Scanning ports on target...",
+      "[+] Port 22 (SSH) open",
+      "[+] Port 80 (HTTP) open",
+      "user@cyberdeck:~$ gobuster dir -u http://192.168.1.104 -w /usr/share/wordlists/dirb/common.txt",
+      "[+] Found: /admin",
+      "[+] Found: /login",
+      "user@cyberdeck:~$ hydra -l admin -P rockyou.txt 192.168.1.104 ssh",
+      "[~] Attempting SSH brute-force...",
+      "[✓] Successful login: admin / shadow123",
+      "user@cyberdeck:~$ ssh admin@192.168.1.104",
+      "admin@192.168.1.104's password: *********",
+      "[✓] Access granted. Logged into remote shell.",
+      "admin@server:/home/admin$ whoami",
+      "admin",
+      "admin@server:/home/admin$ uname -a",
+      "Linux server 5.10.0-23-amd64 x86_64 GNU/Linux",
+      "admin@server:/home/admin$ sudo -l",
+      "[sudo] password for admin: *********",
+      "User admin may run the following commands on this host:",
+      "  (ALL) NOPASSWD: /usr/bin/apt-get",
+      "admin@server:/home/admin$ sudo apt-get update && sudo apt-get install backdoor",
+      "[+] Establishing persistence...",
+      "[+] Exfiltrating credentials...",
+      "[✓] Hack complete. Shell remains active. Monitoring engagement..."
     ];
 
-    const targetSteps = [
-      "📧 New email: 'Your account is locked' - Click to verify",
-      "[!] Suspicious link clicked by user",
-      "🔓 Credentials leaked: admin / ********",
-      "",
-      "🔐 Unusual login from foreign IP detected",
-      "[!] System accessed with weak password",
-      "",
-      "🧮 Database anomaly detected",
-      "[!] Unauthorized query: SELECT * FROM users;",
-      "",
-      "🌐 Network lag detected - traffic rerouted",
-      "[!] Potential MitM: SSL mismatch",
-      "",
-      "💾 New file detected in system32\payload.exe",
-      "[!] Outbound connection initiated",
-      "⚠️ Reverse shell active — system compromised"
-    ];
-
-    function appendLogs(panelId, steps, baseDelay = 1500) {
-      const panel = document.getElementById(panelId);
-      steps.forEach((text, i) => {
-        setTimeout(() => {
-          const line = document.createElement('div');
-          line.className = 'log-line';
-          line.style.animationDelay = `${i * 0.3}s`;
-          line.textContent = text;
-          panel.appendChild(line);
-          panel.scrollTop = panel.scrollHeight;
-        }, i * baseDelay);
-      });
-    }
+    const terminal = document.getElementById("terminalOutput");
 
     function runSimulation() {
-      document.getElementById('hackerPanel').innerHTML = '<div class="title">🧑‍💻 Hacker Terminal</div>';
-      document.getElementById('targetPanel').innerHTML = '<div class="title">🎯 Target System</div>';
-      document.getElementById('doneNotice').style.display = 'none';
-      appendLogs('hackerPanel', hackerSteps, 1400);
-      appendLogs('targetPanel', targetSteps, 1600);
+      terminal.innerHTML = "";
+      lines.forEach((line, index) => {
+        setTimeout(() => {
+          const div = document.createElement("div");
+          div.className = "line";
+          div.style.animationDelay = `${index * 0.2}s`;
+          div.textContent = line;
+          terminal.appendChild(div);
+          terminal.scrollTop = terminal.scrollHeight;
+        }, index * 500);
+      });
 
+      // Restart after 5 seconds of completion
+      const totalTime = lines.length * 500 + 6000;
       setTimeout(() => {
-        document.getElementById('doneNotice').style.display = 'block';
-      }, (hackerSteps.length + 2) * 1400);
+        terminal.innerHTML = "";
+        runSimulation();
+      }, totalTime);
     }
 
     runSimulation();
-    setInterval(runSimulation, (hackerSteps.length + 2) * 1400 + 8000);
   </script>
 </body>
 </html>
+
